@@ -1,0 +1,15 @@
+Original Operator,NNG Operator,Target,Staging Usage,Peak% (Staging),Op Cycles,Network% (cycles),NPU,SRAM AC,DRAM AC,OnFlash AC,OffFlash AC,MAC Count,Network% (MAC),Util% (MAC),Name
+Quantize,Quantize,NPU,9216,5.167309590024222,5616,4.8893029086825175,5616,450,5156,0,0,9216,0.1952442268849775,0.6410256410256411,tfl.quantize
+Conv2D,Conv2D,NPU,150912,84.61469453664664,28124,24.484821047682892,22821,6903,28124,0,0,318096,6.738976518576802,4.418157090029868,sequential/conv2d/Relu;sequential/conv2d/BiasAdd;sequential/conv2d/BiasAdd/ReadVariableOp;sequential/conv2d/Conv2D
+Conv2D,Relu,NPU,0,0.0,0,0.0,0,0,0,0,0,0,0.0,100,sequential/conv2d/Relu;sequential/conv2d/BiasAdd;sequential/conv2d/BiasAdd/ReadVariableOp;sequential/conv2d/Conv2D
+MaxPool,MaxPool,NPU,176720,99.08495559343321,18739,16.31421780730087,18739,9000,0,0,0,70688,1.4975503374615116,1.4735311382677838,sequential/max_pooling2d/MaxPool
+Conv2D,Conv2D,NPU,69376,38.89835830268233,13208,11.498916100049625,13208,3460,7031,0,0,2332800,49.42119493025993,68.99227740763173,sequential/conv2d_1/Relu;sequential/conv2d_1/BiasAdd;sequential/conv2d_1/BiasAdd/ReadVariableOp;sequential/conv2d_1/Conv2D
+Conv2D,Relu,NPU,0,0.0,0,0.0,0,0,0,0,0,0,0.0,100,sequential/conv2d_1/Relu;sequential/conv2d_1/BiasAdd;sequential/conv2d_1/BiasAdd/ReadVariableOp;sequential/conv2d_1/Conv2D
+MaxPool,MaxPool,NPU,40144,22.508298196824256,4832,4.206750650775271,4832,3000,0,0,0,30976,0.6562375403633967,2.504139072847682,sequential/max_pooling2d_1/MaxPool
+Conv2D,Conv2D,NPU,26016,14.586884363505876,10133,8.821813812977199,10133,1748,3124,0,0,1843200,39.0488453769955,71.0549689134511,sequential/conv2d_2/Relu;sequential/conv2d_2/BiasAdd;sequential/conv2d_2/BiasAdd/ReadVariableOp;sequential/conv2d_2/Conv2D
+Conv2D,Relu,NPU,0,0.0,0,0.0,0,0,0,0,0,0,0.0,100,sequential/conv2d_2/Relu;sequential/conv2d_2/BiasAdd;sequential/conv2d_2/BiasAdd/ReadVariableOp;sequential/conv2d_2/Conv2D
+MaxPool,MaxPool,NPU,16000,8.97102359379205,2416,2.1033753253876357,2416,800,0,0,0,12800,0.27117253734024654,2.0695364238410594,sequential/max_pooling2d_2/MaxPool
+FullyConnected,FullyConnected,NPU,3232,1.8121467659459944,31254,27.209806465093198,8173,156,31254,0,0,102400,2.1693802987219724,1.279836180968836,sequential/dense/MatMul;sequential/dense/Relu;sequential/dense/BiasAdd
+FullyConnected,Relu,NPU,0,0.0,0,0.0,0,0,0,0,0,0,0.0,100,sequential/dense/MatMul;sequential/dense/Relu;sequential/dense/BiasAdd
+FullyConnected,FullyConnected,NPU,48,0.026913070781376155,390,0.3395349242140637,73,1,390,0,0,64,0.0013558626867012328,0.0641025641025641,StatefulPartitionedCall:01
+Quantize,Quantize,NPU,16,0.008971023593792052,151,0.13146095783672723,151,1,1,0,0,2,4.2370708959413524e-05,0.005173841059602649,StatefulPartitionedCall:0
