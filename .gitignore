@@ -1,0 +1,9 @@
+vela_env/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.h5
+*.tflite
+!deepvog_light.tflite
+!output/deepvog_light_vela.tflite
+model_data.cc
