@@ -1,0 +1,20 @@
+# Core dependencies
+numpy==1.23.5
+scipy
+flatbuffers
+lxml
+pillow
+
+# AI / ML
+tensorflow==2.10
+
+# Computer Vision
+opencv-python
+matplotlib
+
+# Arm Vela Compiler
+ethos-u-vela
+
+# Optional (recommended for stability)
+packaging
+typing-extensions
