@@ -1,85 +1,107 @@
-# 👁️ DeepVOG Light: Embedded Eye Tracking Model
+# 👁️ DeepVOG Light: Eye Tracking (NPU-Optimized)
 
 > [!IMPORTANT]
-> **Production-Grade Pipeline** for ARM Ethos-U NPU and TFLite Micro.
+> **Complete End-to-End Setup Guide** for ARM Ethos-U NPU and TFLite Micro implementation.
 
-A high-performance, lightweight gaze estimation system designed for **edge artificial intelligence**. This project features a full end-to-end automation suite for training, quantizing, and deploying models to silicon with **ARM Ethos-U** acceleration.
+This project provides a highly optimized, INT8-quantized Deep Learning model for real-time gaze estimation. Designed to run on Cortex-M microcontrollers with **Ethos-U55/85** NPU acceleration.
 
 ---
 
-## 🏗️ System Architecture
-The following diagram illustrates the lifecycle of the model from Keras definition to target hardware deployment.
+## 📸 Sample Input & Output
+To ensure your hardware integration is correct, follow these reference values:
 
+### 📥 Sample Input
+- **Type**: Grayscale Image (Hand-cropped pupil region).
+- **Format**: `96x96` pixels (1 byte per pixel).
+- **Buffer**: `uint8_t input_buffer[9216]` (Array of flattened pixels).
+- **Example Data**: `[127, 128, 128, 127, ...]` (Normalized range).
+
+### 📤 Sample Output
+- **Type**: 2-Element Gaze Points (X, Y).
+- **Example Gaze X**: `91`
+- **Example Gaze Y**: `195`
+*(These values represent normalized coordinates for gaze tracking).*
+
+---
+
+## 🏗️ Technical Workflow
 ```mermaid
-graph TD
-    subgraph "🎨 Design Phase"
-        A[deepvog_light.py] -->|Keras Model| B(convert_deepvog.py)
-    end
-
-    subgraph "⚡ Optimization Phase"
-        B -->|INT8 TFLite| C{Vela Compiler}
-        C -->|Optimized Binary| D(generate_cc.py)
-    end
-
-    subgraph "🎯 Deployment"
-        D -->|C++ Header| E[main.cpp]
-        E -->|TFLite Micro| F(ARM Ethos-U NPU)
-    end
-
-    style A fill:#4CAF50,stroke:#2E7D32,color:#fff
-    style C fill:#2196F3,stroke:#1565C0,color:#fff
-    style F fill:#f44336,stroke:#c62828,color:#fff
+graph LR
+    A[Raw Image] --> B(Resize 96x96)
+    B --> C(Grayscale)
+    C --> D{NPU Inference}
+    D --> E[Gaze X, Y]
+    
+    style D fill:#f44336,stroke:#c62828,color:#fff
 ```
 
 ---
 
-## 🚀 The "Perfect" Pipeline
-We provide a unified script to handle the entire complexity of the toolchain.
+## 🛠️ Complete Setup Guide (How to Use)
 
-### 🛠️ One-Click Automation
-Run the following in your PowerShell terminal to rebuild everything:
+### 1️⃣ Environment Preparation
+Ensure you have Python 3.9+ installed. Run the following to install all core dependencies:
+```bash
+pip install tensorflow==2.10 numpy==1.23.5 ethos-u-vela pillow opencv-python
+```
+
+### 2️⃣ Automated Model Pipeline
+The included PowerShell script handles everything from Keras training to C++ code generation.
 ```powershell
+# In the project root, run:
 .\pipeline.ps1
 ```
-
 > [!TIP]
-> Ensure your `vela_env` is properly set up. The pipeline handles activation automatically!
+> This command will update your `model_data.cc` automatically!
+
+### 3️⃣ Hardware Integration (C++ Example)
+To use the model in your user code (e.g., in `main.cpp` using TFLite Micro):
+
+```cpp
+#include "model_data.cc"  // The generated model header
+
+// 1. Get the input tensor
+TfLiteTensor* model_input = interpreter->input(0);
+
+// 2. Feed your eye image buffer (96x96)
+memcpy(model_input->data.uint8, your_eye_buffer, 96 * 96);
+
+// 3. Run Inference
+interpreter->Invoke();
+
+// 4. Read Gaze Results
+int gaze_x = interpreter->output(0)->data.uint8[0];
+int gaze_y = interpreter->output(0)->data.uint8[1];
+
+printf("👁️ Eye Gaze Detected: X=%d, Y=%d\n", gaze_x, gaze_y);
+```
 
 ---
 
-## 📁 Repository Map
-| Component | Function | Color Code |
-| :--- | :--- | :--- |
-| 🐍 `deepvog_light.py` | Model Definition & Architecture | 🟢 Green (Source) |
-| 💎 `convert_deepvog.py`| INT8 Post-Training Quantization | 🔵 Blue (Opt) |
-| ⚙️ `generate_cc.py` | TFLite-to-C Deployment Tool | ⚪ Grey (Utility)|
-| 📑 `README.md` | "Perfect" Documentation | 🟡 Yellow (Info) |
-| 📦 `output/` | Compiled Artefacts & Reports | 🔴 Red (Build) |
+## 📁 Repository Structure
+- **`deepvog_light.py`**: Model architecture & initialization.
+- **`convert_deepvog.py`**: INT8 quantization logic for NPU.
+- **`pipeline.ps1`**: **[Main Pipeline]** Full automation for Windows.
+- **`output/model_data.cc`**: The final embedded model array (C++ source).
+- **`output/main.cpp`**: Reference inference loop for TFLite Micro.
 
 ---
 
-## 📊 Performance Benchmarks (Ethos-U)
-The model is optimized for the **ARM Ethos-U55-128** configuration.
+## 📊 Performance on NPU (Ethos-U55)
+| Metric | Performance |
+| :--- | :--- |
+| **Op Cycles** | ~115,000 |
+| **SRAM Peak** | 176 KB |
+| **Network % cycles on NPU** | 100% |
 
-- **⚡ Latency**: ~115,000 Cycles 
-- **💾 SRAM Footprint**: 176 KB
-- **📦 Model Size**: ~114 KB (INT8)
-
-> [!CAUTION]
-> Changing the model input shape (96, 96, 1) will require updating the reference image size in `main.cpp`.
-
----
-
-## 🛠️ Requirements & Setup
-1. **Python 3.9+**
-2. **TensorFlow & NumPy**
-3. **ARM Vela Compiler** (Pre-installed in local `vela_env`)
+> [!NOTE]
+> All layers are supported by the Ethos-U NPU. No CPU fallbacks are required.
 
 ---
 
-## 👤 Credits
-**Mani** - *Leading Edge AI Developer*
+## 👨‍💻 Developed by
+**Mani** - *Leading Eye Tracking Research*
 
 ---
 
-*© 2026 Mani - Optimized Eye Tracking Solutions*
+*© 2026 Mani - AI for Everyone*
